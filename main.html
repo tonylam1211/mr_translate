@@ -9,9 +9,15 @@
     <link href="https://fonts.googleapis.com/css?family=Hachi+Maru+Pop" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Yusei+Magic" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Reggae+One" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Noto+Sans+JP" rel="stylesheet">
+    <!--  <link href="https://fonts.googleapis.com/css?family=Noto+Sans+JP" rel="stylesheet">  -->
     <link href="https://fonts.googleapis.com/css?family=Sawarabi+Gothic" rel="stylesheet">
     <link href="https://fonts.googleapis.com/earlyaccess/nicomoji.css" rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+HK:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 
     <link href="./font.css" rel="stylesheet">
 
@@ -68,19 +74,31 @@
         
         #speech_text {
             letter-spacing: 10px;
+            font-family: "Noto Sans HK", sans-serif;
+            padding: 5px;
         }
+        /* Cantonese */
         
         #trans_text {
-            letter-spacing: 5px;
+            letter-spacing: 8px;
+            font-family: "Noto Sans", sans-serif;
+            padding: 5px;
         }
+        /* English */
         
         #trans_text2 {
-            letter-spacing: 5px;
+            letter-spacing: 8px;
+            font-family: "Noto Sans JP", sans-serif;
+            padding: 5px;
         }
+        /* Japanese */
         
         #trans_text3 {
-            letter-spacing: 5px
+            letter-spacing: 8px;
+            font-family: "Noto Sans", sans-serif;
+            padding: 5px;
         }
+        /* Spanish */
         
         table {
             width: 100%;
@@ -732,14 +750,18 @@
         document.getElementById("trans_text3-imb").style.webkitTextStrokeWidth = getParam('st_width4') + 'pt';
     }
 
-
-
     // 表示設定 ############################################
     // 全体共通 ----------------
 
+    // Would you ignore the fonts params
+    var ignore_cantonese = getParam('ignore_cantonese');
+    var fixed_fonts = getParam('fixed_fonts');
+
     // 音声認識結果 ----------------
     if (getParam('speech_text_font') != null) {
-        document.getElementById("speech_text").style.fontFamily = "'" + getParam('speech_text_font') + "'";
+        if (ignore_cantonese === "false") {
+            document.getElementById("speech_text").style.fontFamily = "'" + getParam('speech_text_font') + "'";
+        }
     }
 
     if (getParam('size1') != null) {
@@ -768,7 +790,11 @@
 
     // 翻訳結果テキスト ----------------
     if (getParam('trans_text_font') != null) {
-        document.getElementById("trans_text").style.fontFamily = "'" + getParam('trans_text_font') + "'";
+        if (fixed_fonts === "true") {
+            document.getElementById("trans_text").style.fontFamily = "'" + "Noto Sans" + "'";
+        } else {
+            document.getElementById("trans_text").style.fontFamily = "'" + getParam('trans_text_font') + "'";
+        }
     }
 
     if (getParam('size2') != null) {
@@ -797,9 +823,12 @@
 
     // 翻訳結果テキスト（第2言語） -----------
     if (getParam('trans_text2_font') != null) {
-        document.getElementById("trans_text2").style.fontFamily = "'" + getParam('trans_text2_font') + "'";
+        if (fixed_fonts === "true") {
+            document.getElementById("trans_text2").style.fontFamily = "'" + "Noto Sans JP" + "'";
+        } else {
+            document.getElementById("trans_text2").style.fontFamily = "'" + getParam('trans_text2_font') + "'";
+        }
     }
-
 
     if (getParam('size3') != null) {
         document.getElementById("trans_text2").style.fontSize = getParam('size3') + 'pt';
@@ -827,9 +856,12 @@
 
     // 翻訳結果テキスト（第2言語） -----------
     if (getParam('trans_text3_font') != null) {
-        document.getElementById("trans_text3").style.fontFamily = "'" + getParam('trans_text3_font') + "'";
+        if (fixed_fonts === "true") {
+            document.getElementById("trans_text3").style.fontFamily = "'" + "Noto Sans" + "'";
+        } else {
+            document.getElementById("trans_text3").style.fontFamily = "'" + getParam('trans_text3_font') + "'";
+        }
     }
-
 
     if (getParam('size4') != null) {
         document.getElementById("trans_text3").style.fontSize = getParam('size4') + 'pt';
