@@ -163,22 +163,22 @@
 
         // 一定時間変化がなかったら消す ------------------------------------
         var fn_del = function() {
-            document.getElementById('speech_text-imb').innerHTML = '';
-            document.getElementById('speech_text-bg').innerHTML = '';
-            document.getElementById('speech_text-bg2').innerHTML = '';
-            document.getElementById('speech_text-fg').innerHTML = '';
-            document.getElementById('trans_text-imb').innerHTML = '';
-            document.getElementById('trans_text-bg').innerHTML = '';
-            document.getElementById('trans_text-bg2').innerHTML = '';
-            document.getElementById('trans_text-fg').innerHTML = '';
-            document.getElementById('trans_text2-imb').innerHTML = '';
-            document.getElementById('trans_text2-bg').innerHTML = '';
-            document.getElementById('trans_text2-bg2').innerHTML = '';
-            document.getElementById('trans_text2-fg').innerHTML = '';
-            document.getElementById('trans_text3-imb').innerHTML = '';
-            document.getElementById('trans_text3-bg').innerHTML = '';
-            document.getElementById('trans_text3-bg2').innerHTML = '';
-            document.getElementById('trans_text3-fg').innerHTML = '';
+            document.getElementById('speech_text-imb').innerHTML = '[Speech Text]';
+            document.getElementById('speech_text-bg').innerHTML = '[Speech Text]';
+            document.getElementById('speech_text-bg2').innerHTML = '[Speech Text]';
+            document.getElementById('speech_text-fg').innerHTML = '[Speech Text]';
+            document.getElementById('trans_text-imb').innerHTML = '[Translate1]';
+            document.getElementById('trans_text-bg').innerHTML = '[Translate1]';
+            document.getElementById('trans_text-bg2').innerHTML = '[Translate1]';
+            document.getElementById('trans_text-fg').innerHTML = '[Translate1]';
+            document.getElementById('trans_text2-imb').innerHTML = '[Translate2]';
+            document.getElementById('trans_text2-bg').innerHTML = '[Translate2]';
+            document.getElementById('trans_text2-bg2').innerHTML = '[Translate2]';
+            document.getElementById('trans_text2-fg').innerHTML = '[Translate2]';
+            document.getElementById('trans_text3-imb').innerHTML = '[Translate3]';
+            document.getElementById('trans_text3-bg').innerHTML = '[Translate3]';
+            document.getElementById('trans_text3-bg2').innerHTML = '[Translate3]';
+            document.getElementById('trans_text3-fg').innerHTML = '[Translate3]';
 
             // 各フラグをリセット
             isSpeechRecognitionComplete = false;
@@ -230,11 +230,16 @@
         var stop_recog;
         var id_stop_recog;
 
+        var force_stop_recog;
+        var id_force_stop_recog;
+
         var count = 0;
 
         // URLから Bad/Good 単語リストをリスト形式で読み込む -----------------------
         let languageId = arg_recog;
         const baseURL = "https://raw.githubusercontent.com/sayonari/goodBadWordlist/main/";
+
+        /*
         const badListPath = `/BadList.txt`; // 禁止ワードリストのパス
         const goodListPath = `/GoodList.txt`; // 許可ワードリストのパス
         var badWords_forRecog = [];
@@ -257,6 +262,7 @@
                     goodWords_forRecog = t.split("\n").filter(Boolean);
                 });
         }
+        */
 
 
         // 音声認識本体 /////////////////////////////////////////////////
@@ -298,6 +304,11 @@
             recognition.stop();
         };
 
+        force_stop_recog = function() {
+            console.log("stop by force end recog!");
+            recognition.stop();
+        };
+
         ///////////////////////////////////////////////////////////
         // 各種イベントへの対応 --------------------------------- 
         // 音声・認識 開始
@@ -312,11 +323,16 @@
         }
         recognition.onspeechstart = () => {
             console.log("onspeechstart cnt:" + String(my_count));
+
+            var forceStopRecog = getParam('forceStopRecog');
+            if (forceStopRecog != null) clearTimeout(id_force_stop_recog);
+            if (forceStopRecog != null) id_force_stop_recog = setTimeout(force_stop_recog, forceStopRecog);
         }
 
         // 音声・認識 終了
         recognition.onspeechend = () => {
             console.log("onspeechend cnt:" + String(my_count));
+            clearTimeout(id_force_stop_recog);
         }
         recognition.onsoundend = () => {
             console.log("onsoundend cnt:" + String(my_count));
@@ -364,34 +380,6 @@
 
                 // 認識結果をget （途中結果 or 最終結果） ------------
                 var recog_text = results[i][0].transcript;
-
-                // #############################################################
-                // 危険単語を検知して，結果を***に置き換える #########################
-
-                // 保護する単語を一時的なプレースホルダーに置き換える --------
-                goodWords_forRecog.forEach((word, index) => {
-                    let placeholder = `{{GOOD_WORD_${index}}}`;
-                    recog_text = recog_text.replace(new RegExp(word, "gi"), placeholder);
-                });
-
-                // 認識結果の中の危険単語を検知して，結果を***に置き換える ---
-                if (anti_sexual != 'false') {
-                    badWords_forRecog.forEach(word => {
-                        let regex = new RegExp(word, "gi");
-                        recog_text = recog_text.replace(regex, "*".repeat(word.length));
-                    });
-                }
-                // console.log("bad:" + badWords_forRecog.length);
-                // console.log(badWords_forRecog, goodWords_forRecog);
-
-                // 一時的なプレースホルダーを保護する単語に戻す -------------
-                goodWords_forRecog.forEach((word, index) => {
-                    let placeholder = `{{GOOD_WORD_${index}}}`;
-                    recog_text = recog_text.replace(new RegExp(placeholder, "g"), word);
-                });
-
-                // #############################################################
-
 
                 // #################################################################
                 // 認識最終結果が来たら ###############################################
