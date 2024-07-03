@@ -227,6 +227,10 @@
         //     short_pause = 0;
         // }
 
+        // Force end recog after this milisecond.
+        var forceStopRecog = getParam('forceStopRecog');
+
+
         var stop_recog;
         var id_stop_recog;
 
@@ -302,11 +306,15 @@
         stop_recog = function() {
             console.log("stop by short pause!");
             recognition.stop();
+
+            if (forceStopRecog != null) clearTimeout(id_force_stop_recog);
         };
 
         force_stop_recog = function() {
             console.log("stop by force end recog!");
             recognition.stop();
+
+            if (short_pause != null) clearTimeout(id_stop_recog);
         };
 
         ///////////////////////////////////////////////////////////
@@ -324,7 +332,6 @@
         recognition.onspeechstart = () => {
             console.log("onspeechstart cnt:" + String(my_count));
 
-            var forceStopRecog = getParam('forceStopRecog');
             if (forceStopRecog != null) clearTimeout(id_force_stop_recog);
             if (forceStopRecog != null) id_force_stop_recog = setTimeout(force_stop_recog, forceStopRecog);
         }
